@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucky Casino</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101014;
+  color: white;
+  text-align: center;
+}
+
+header {
+  padding: 25px;
+  background: #19191f;
+  border-bottom: 2px solid #d6a629;
+}
+
+h1 {
+  color: #f5c542;
+  margin: 0;
+  font-size: 30px;
+}
+
+header p {
+  color: #aaa;
+  margin-bottom: 0;
+}
+
+.balance {
+  margin: 25px auto;
+  background: #202027;
+  padding: 20px;
+  border-radius: 15px;
+  max-width: 350px;
+}
+
+.balance h2 {
+  margin: 0;
+  color: #aaa;
+  font-size: 16px;
+}
+
+#coins {
+  color: #f5c542;
+  font-size: 35px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.game {
+  background: #202027;
+  max-width: 420px;
+  margin: 20px auto;
+  padding: 25px;
+  border-radius: 18px;
+}
+
+.game h2 {
+  color: #f5c542;
+}
+
+.slots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+.reel {
+  background: #fff;
+  color: #111;
+  width: 85px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  border-radius: 12px;
+}
+
+input {
+  background: #111;
+  color: white;
+  border: 1px solid #555;
+  padding: 12px;
+  width: 100px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+}
+
+button {
+  background: #e5b52f;
+  color: #111;
+  border: none;
+  padding: 14px 24px;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  margin: 8px;
+}
+
+button:active {
+  transform: scale(.96);
+}
+
+button:disabled {
+  opacity: .5;
+}
+
+#result {
+  min-height: 35px;
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.reset {
+  background: #444;
+  color: white;
+  font-size: 13px;
+}
+
+footer {
+  color: #777;
+  padding: 25px;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎰 LUCKY CASINO</h1>
+  <p>Your virtual casino. Play with fake coins!</p>
+</header>
+
+<div class="balance">
+  <h2>YOUR BALANCE</h2>
+  <div id="coins">1,000 🪙</div>
+</div>
+
+<div class="game">
+  <h2>🎰 SLOT MACHINE</h2>
+
+  <div class="slots">
+    <div class="reel" id="reel1">🍒</div>
+    <div class="reel" id="reel2">🍋</div>
+    <div class="reel" id="reel3">🍇</div>
+  </div>
+
+  <p>Choose your bet</p>
+
+  <input
+    type="number"
+    id="bet"
+    value="50"
+    min="1"
+    max="1000"
+  >
+
+  <br>
+
+  <button id="spinButton" onclick="spin()">SPIN 🎰</button>
+
+  <div id="result">Good luck!</div>
+
+  <button class="reset" onclick="resetGame()">
+    Reset Balance
+  </button>
+</div>
+
+<footer>
+  Lucky Casino © 2026<br>
+  Virtual coins only. No real money involved.
+</footer>
+
+<script>
+let coins = Number(localStorage.getItem("luckyCoins")) || 1000;
+
+const symbols = ["🍒", "🍋", "🍇", "🍊", "💎", "7️⃣"];
+
+function updateBalance() {
+  document.getElementById("coins").textContent =
+    coins.toLocaleString() + " 🪙";
+
+  localStorage.setItem("luckyCoins", coins);
+}
+
+function spin() {
+  const bet = Number(document.getElementById("bet").value);
+  const result = document.getElementById("result");
+  const button = document.getElementById("spinButton");
+
+  if (!Number.isInteger(bet) || bet < 1) {
+    result.textContent = "Enter a valid bet!";
+    return;
+  }
+
+  if (bet > coins) {
+    result.textContent = "Not enough coins!";
+    return;
+  }
+
+  coins -= bet;
+  updateBalance();
+
+  button.disabled = true;
+  result.textContent = "Spinning...";
+
+  let spins = 0;
+
+  const animation = setInterval(() => {
+    document.getElementById("reel1").textContent =
+      symbols[Math.floor(Math.random() * symbols.length)];
+
+    document.getElementById("reel2").textContent =
+      symbols[Math.floor(Math.random() * symbols.length)];
+
+    document.getElementById("reel3").textContent =
+      symbols[Math.floor(Math.random() * symbols.length)];
+
+    spins++;
+
+    if (spins >= 12) {
+      clearInterval(animation);
+
+      const a = symbols[Math.floor(Math.random() * symbols.length)];
+      const b = symbols[Math.floor(Math.random() * symbols.length)];
+      const c = symbols[Math.floor(Math.random() * symbols.length)];
+
+      document.getElementById("reel1").textContent = a;
+      document.getElementById("reel2").textContent = b;
+      document.getElementById("reel3").textContent = c;
+
+      let winnings = 0;
+
+      if (a === b && b === c) {
+        winnings = bet * (a === "7️⃣" ? 20 : a === "💎" ? 12 : 8);
+        result.textContent = "🎉 JACKPOT! You won " +
+          winnings.toLocaleString() + " coins!";
+      } else if (a === b || b === c || a === c) {
+        winnings = bet * 2;
+        result.textContent = "✨ Nice! You won " +
+          winnings.toLocaleString() + " coins!";
+      } else {
+        result.textContent = "😢 No match! Better luck next time.";
+      }
+
+      coins += winnings;
+      updateBalance();
+      button.disabled = false;
+    }
+  }, 100);
+}
+
+function resetGame() {
+  if (confirm("Reset your balance to 1,000 coins?")) {
+    coins = 1000;
+    updateBalance();
+    document.getElementById("result").textContent =
+      "Balance reset! Good luck!";
+  }
+}
+
+updateBalance();
+</script>
+
+</body>
+</html>
